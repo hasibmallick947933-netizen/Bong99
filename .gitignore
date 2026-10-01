@@ -1,0 +1,10 @@
+node_modules/
+.next/
+out/
+build/
+.DS_Store
+*.log
+.ref_frames/
+.env.local
+.env*.local
+*.mov
