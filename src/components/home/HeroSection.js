@@ -3,160 +3,202 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Sparkles, Flame, ShieldCheck, Zap } from 'lucide-react';
+import { ArrowRight, Sparkles, Flame, ShieldCheck, Zap, Layers, RefreshCw, Smartphone } from 'lucide-react';
 
 export default function HeroSection() {
   return (
-    <section className="relative min-h-[92vh] flex flex-col justify-between bg-zinc-950 overflow-hidden border-b border-zinc-900 pt-6">
-      {/* Background Decorative Gradients & Mesh */}
-      <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-amber-400/10 rounded-full blur-[160px] pointer-events-none" />
-      <div className="absolute bottom-10 left-1/4 w-[400px] h-[400px] bg-red-600/10 rounded-full blur-[140px] pointer-events-none" />
+    <section className="relative bg-[#FAFAFA] text-black overflow-hidden border-b border-zinc-200 pt-6 pb-12 sm:pb-16">
+      {/* Background Soft Glow */}
+      <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-[#FEDE32]/20 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-10 left-10 w-[500px] h-[500px] bg-[#006838]/10 rounded-full blur-[160px] pointer-events-none" />
 
-      {/* Main Hero Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-8 sm:py-16 my-auto">
+      {/* Main Hero Container */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-8 sm:py-14 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
           {/* Left Text & CTAs */}
-          <div className="lg:col-span-7 space-y-6 text-center lg:text-left z-10">
-            {/* Pill Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 shadow-inner">
-              <span className="flex h-2 w-2 relative">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400" />
-              </span>
-              <span className="text-xs font-bold text-zinc-300 uppercase tracking-widest">
-                Indian Street-Fashion Revolution
-              </span>
+          <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
+            {/* Bengali Badge & Price Pills from LOGO.png */}
+            <div className="inline-flex flex-wrap items-center justify-center lg:justify-start gap-2">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FEDE32] text-black border border-[#E5C815] text-xs font-black shadow-sm">
+                <span>দারুণ কোয়ালিটি, অবিশ্বাস্য দাম ♡</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="px-2.5 py-0.5 rounded-full bg-[#006838] text-white text-[11px] font-black">₹99</span>
+                <span className="px-2.5 py-0.5 rounded-full bg-[#F39200] text-black text-[11px] font-black">₹149</span>
+                <span className="px-2.5 py-0.5 rounded-full bg-[#E30613] text-white text-[11px] font-black">₹199</span>
+              </div>
             </div>
 
-            {/* Huge Headline: STYLE STARTS AT ₹99 */}
-            <h1 className="text-5xl sm:text-7xl xl:text-8xl font-black text-white tracking-tighter uppercase font-display leading-[0.9]">
+            {/* Main Headline */}
+            <h1 className="text-5xl sm:text-7xl xl:text-8xl font-black text-black tracking-tighter uppercase font-display leading-[0.9]">
               STYLE <br />
               STARTS AT <br />
-              <span className="text-amber-400 drop-shadow-[0_10px_35px_rgba(245,158,11,0.3)]">
-                ₹99.
-              </span>
+              <span className="text-[#006838]">₹99.</span>
             </h1>
 
-            {/* Supporting Tagline */}
-            <p className="text-lg sm:text-xl font-medium text-zinc-300 max-w-lg mx-auto lg:mx-0 leading-relaxed">
-              Trendy clothing. Crazy prices. No generic templates — authentic street-wear fits crafted from heavyweight bio-washed cotton.
+            {/* Tagline & Rationale */}
+            <p className="text-base sm:text-lg font-medium text-zinc-700 max-w-xl mx-auto lg:mx-0 leading-relaxed font-sans">
+              Authentic Indian streetwear. 100% bio-washed combed cotton with heavyweight drape. 
+              Plain basics at <strong>₹99</strong>, graphic drops at <strong>₹149</strong>, bottoms at <strong>₹179</strong>, and structured polos at <strong>₹189</strong>.
             </p>
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5 pt-2">
               <Link
                 href="/shop"
-                className="w-full sm:w-auto px-8 py-4 bg-amber-400 hover:bg-amber-300 text-black font-black text-sm uppercase tracking-wider rounded-2xl flex items-center justify-center gap-2.5 transition-all shadow-xl shadow-amber-400/25 active:scale-95"
+                className="w-full sm:w-auto px-8 py-4 bg-black hover:bg-zinc-800 text-white font-black text-xs uppercase tracking-wider rounded-2xl flex items-center justify-center gap-2.5 transition-all shadow-xl active:scale-95"
               >
-                <span>SHOP NOW</span>
+                <span>EXPLORE ALL DROPS</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
-                href="#scroll-experience"
-                className="w-full sm:w-auto px-8 py-4 bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-sm uppercase tracking-wider rounded-2xl flex items-center justify-center gap-2 transition-all border border-zinc-700/80"
+                href="/plain-tshirts"
+                className="w-full sm:w-auto px-7 py-4 bg-white hover:bg-zinc-100 text-black font-black text-xs uppercase tracking-wider rounded-2xl flex items-center justify-center gap-2 transition-all border-2 border-zinc-300 shadow-sm"
               >
-                <span>EXPLORE COLLECTION</span>
+                <span>PLAIN TEES ₹99 (RACK)</span>
               </Link>
             </div>
 
-            {/* Micro Feature Badges */}
-            <div className="pt-4 flex flex-wrap items-center justify-center lg:justify-start gap-6 text-xs text-zinc-400">
-              <div className="flex items-center gap-2">
-                <Flame className="w-4 h-4 text-amber-400" />
-                <span>Drops starting at ₹99</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Zap className="w-4 h-4 text-emerald-400" />
-                <span>Same-day Dispatch</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-blue-400" />
-                <span>100% Bio-Washed Cotton</span>
+            {/* Jump links to the 4 specific experiences */}
+            <div className="pt-4 border-t border-zinc-200">
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-zinc-500 block mb-2.5">
+                INTERACTIVE FASHION SHOWCASES:
+              </span>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-left">
+                <Link
+                  href="/plain-tshirts"
+                  className="p-2.5 rounded-xl bg-white border border-zinc-200 hover:border-black transition-all shadow-sm group"
+                >
+                  <div className="text-[10px] font-bold text-zinc-500 flex items-center justify-between">
+                    <span>BAFK Rack</span>
+                    <span className="text-[#006838] font-black">₹99</span>
+                  </div>
+                  <div className="text-xs font-black text-black group-hover:text-amber-800 mt-0.5 line-clamp-1">
+                    Plain T-Shirts
+                  </div>
+                </Link>
+
+                <Link
+                  href="/printed-tshirts"
+                  className="p-2.5 rounded-xl bg-white border border-zinc-200 hover:border-black transition-all shadow-sm group"
+                >
+                  <div className="text-[10px] font-bold text-zinc-500 flex items-center justify-between">
+                    <span>Tag Orbit</span>
+                    <span className="text-[#E30613] font-black">₹149</span>
+                  </div>
+                  <div className="text-xs font-black text-black group-hover:text-red-600 mt-0.5 line-clamp-1">
+                    Graphic Drops
+                  </div>
+                </Link>
+
+                <Link
+                  href="/polo"
+                  className="p-2.5 rounded-xl bg-white border border-zinc-200 hover:border-black transition-all shadow-sm group"
+                >
+                  <div className="text-[10px] font-bold text-zinc-500 flex items-center justify-between">
+                    <span>Polo Wheel</span>
+                    <span className="text-black font-black">₹189</span>
+                  </div>
+                  <div className="text-xs font-black text-black group-hover:text-amber-900 mt-0.5 line-clamp-1">
+                    Structured Pique
+                  </div>
+                </Link>
+
+                <Link
+                  href="/lowers"
+                  className="p-2.5 rounded-xl bg-white border border-zinc-200 hover:border-black transition-all shadow-sm group"
+                >
+                  <div className="text-[10px] font-bold text-zinc-500 flex items-center justify-between">
+                    <span>Phone View</span>
+                    <span className="text-black font-black">₹179</span>
+                  </div>
+                  <div className="text-xs font-black text-black group-hover:text-emerald-800 mt-0.5 line-clamp-1">
+                    Street Lowers
+                  </div>
+                </Link>
               </div>
             </div>
           </div>
 
-          {/* Right Visual Stage with Layered Clothing Photography */}
+          {/* Right Visual Showcase featuring official Brand LOGO & Model */}
           <div className="lg:col-span-5 relative flex items-center justify-center">
-            {/* Background Graphic Circle Ring */}
-            <div className="relative w-[340px] h-[400px] sm:w-[440px] sm:h-[500px] rounded-3xl bg-gradient-to-tr from-zinc-900 via-zinc-900/40 to-zinc-800/80 p-3 border border-zinc-800 shadow-2xl backdrop-blur-sm overflow-hidden flex items-center justify-center">
-              {/* Hero Image */}
-              <div className="relative w-full h-full rounded-2xl overflow-hidden">
+            {/* Visual Card Frame */}
+            <div className="relative w-[340px] h-[440px] sm:w-[420px] sm:h-[520px] rounded-3xl bg-white p-3 border-2 border-zinc-300 shadow-2xl overflow-hidden flex flex-col justify-between">
+              {/* Top Banner inside Card */}
+              <div className="relative w-full h-[76%] rounded-2xl overflow-hidden bg-zinc-100">
                 <Image
                   src="https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=1000&auto=format&fit=crop&q=80"
                   alt="Bong99 Streetwear Model"
                   fill
-                  className="object-cover object-top filter contrast-105"
+                  className="object-cover object-top"
                   priority
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent opacity-80" />
-              </div>
 
-              {/* Floating Price Callout 1: Plain ₹99 */}
-              <div className="absolute -top-3 left-4 bg-zinc-950/90 border border-zinc-700 rounded-2xl p-3 shadow-xl backdrop-blur-md flex items-center gap-3 animate-pulse-subtle">
-                <div className="w-9 h-9 rounded-xl bg-amber-400 text-black font-black font-display text-sm flex items-center justify-center">
-                  ₹99
-                </div>
-                <div>
-                  <div className="text-[10px] text-zinc-400 uppercase font-bold tracking-wider">
-                    Plain T-Shirts
+                {/* Floating Official Brand Bag Logo */}
+                <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-md rounded-2xl p-2.5 border border-zinc-200 shadow-xl flex items-center gap-2.5">
+                  <div className="relative w-10 h-10 rounded-xl overflow-hidden bg-[#FEDE32] p-1 flex-shrink-0">
+                    <Image
+                      src="/logo.png"
+                      alt="Bong99 Official Logo"
+                      fill
+                      className="object-contain"
+                    />
                   </div>
-                  <div className="text-xs font-black text-white">
-                    Bio-Washed 180 GSM
+                  <div>
+                    <div className="text-xs font-black text-black font-display">
+                      BONG99
+                    </div>
+                    <div className="text-[9px] font-bold text-[#006838]">
+                      More Choices. Less Prices.
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Floating Price Callout 2: Graphic ₹149 */}
-              <div className="absolute bottom-6 -right-3 bg-zinc-950/90 border border-zinc-700 rounded-2xl p-3 shadow-xl backdrop-blur-md flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-red-600 text-white font-black font-display text-sm flex items-center justify-center">
-                  ₹149
-                </div>
-                <div>
-                  <div className="text-[10px] text-zinc-400 uppercase font-bold tracking-wider">
-                    Graphic Drops
-                  </div>
-                  <div className="text-xs font-black text-white">
-                    Cyber & Tokyo Prints
-                  </div>
+                {/* Direct Price Tag */}
+                <div className="absolute bottom-3 right-3 bg-black text-white px-3 py-1.5 rounded-full font-black text-xs tracking-wider shadow-lg flex items-center gap-1.5">
+                  <Flame className="w-3.5 h-3.5 text-[#FEDE32]" />
+                  <span>STARTS ₹99</span>
                 </div>
               </div>
 
-              {/* Floating Price Callout 3: Track Pants ₹179 */}
-              <div className="absolute bottom-6 -left-3 bg-zinc-950/90 border border-zinc-700 rounded-2xl p-3 shadow-xl backdrop-blur-md flex items-center gap-3 hidden sm:flex">
-                <div className="w-9 h-9 rounded-xl bg-emerald-500 text-black font-black font-display text-sm flex items-center justify-center">
-                  ₹179
-                </div>
+              {/* Lower Card Bar */}
+              <div className="p-2 flex items-center justify-between">
                 <div>
-                  <div className="text-[10px] text-zinc-400 uppercase font-bold tracking-wider">
-                    Lowers & Joggers
+                  <div className="text-xs font-black text-black">
+                    Super Combed 180-220 GSM
                   </div>
-                  <div className="text-xs font-black text-white">
-                    Street Relaxed Fit
+                  <div className="text-[10px] text-zinc-500">
+                    Bio-Washed • Zero Shrinkage • COD
                   </div>
                 </div>
+                <Link
+                  href="/shop"
+                  className="px-3.5 py-1.5 bg-[#006838] text-white rounded-full text-[11px] font-black uppercase tracking-wider hover:bg-[#00552E] transition-colors"
+                >
+                  Shop Now
+                </Link>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Streetwear Marquee Ticker */}
-      <div className="w-full bg-zinc-900 border-y border-zinc-800 py-3 overflow-hidden">
-        <div className="flex whitespace-nowrap animate-marquee-infinite text-xs sm:text-sm font-black tracking-widest text-zinc-300 uppercase font-display">
-          <span className="mx-6 text-amber-400">★ BONG99 STREETWEAR</span>
+      {/* Brand Marquee Ticker */}
+      <div className="w-full bg-black text-white py-3 overflow-hidden border-y border-zinc-800">
+        <div className="flex whitespace-nowrap animate-marquee-infinite text-xs sm:text-sm font-black tracking-widest uppercase font-display">
+          <span className="mx-6 text-[#FEDE32]">★ BONG99 STREETWEAR</span>
+          <span className="mx-6">PLAIN TEES ₹99 (UGMONK RACK)</span>
+          <span className="mx-6 text-[#FEDE32]">★ GRAPHIC TEES ₹149 (TAG ORBIT)</span>
+          <span className="mx-6">POLO TEES ₹189 (WHEEL)</span>
+          <span className="mx-6 text-[#FEDE32]">★ LOWERS ₹179 (PHONE RUNWAY)</span>
+          <span className="mx-6">দারুণ কোয়ালিটি, অবিশ্বাস্য দাম ♡</span>
+          <span className="mx-6 text-[#FEDE32]">★ 100% BIO-WASHED COTTON</span>
+          <span className="mx-6">CASH ON DELIVERY ALL INDIA</span>
+          <span className="mx-6 text-[#FEDE32]">★ BONG99 STREETWEAR</span>
           <span className="mx-6">PLAIN TEES ₹99</span>
-          <span className="mx-6 text-amber-400">★ GRAPHIC TEES ₹149</span>
+          <span className="mx-6 text-[#FEDE32]">★ GRAPHIC TEES ₹149</span>
           <span className="mx-6">POLO TEES ₹189</span>
-          <span className="mx-6 text-amber-400">★ LOWERS ₹179</span>
-          <span className="mx-6">OFF-SHOULDER ₹189</span>
-          <span className="mx-6 text-amber-400">★ 100% BIO-WASHED COTTON</span>
-          <span className="mx-6">CRAZY PRICES</span>
-          <span className="mx-6 text-amber-400">★ BONG99 STREETWEAR</span>
-          <span className="mx-6">PLAIN TEES ₹99</span>
-          <span className="mx-6 text-amber-400">★ GRAPHIC TEES ₹149</span>
-          <span className="mx-6">POLO TEES ₹189</span>
-          <span className="mx-6 text-amber-400">★ LOWERS ₹179</span>
+          <span className="mx-6 text-[#FEDE32]">★ LOWERS ₹179</span>
         </div>
       </div>
     </section>
