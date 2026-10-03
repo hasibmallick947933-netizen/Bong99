@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingBag, ArrowRight, RotateCw, Sparkles, Check, Instagram, Globe } from 'lucide-react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { ShoppingBag, ArrowRight, Instagram, RotateCw } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 
 export const POLO_ITEMS = [
@@ -18,7 +18,6 @@ export const POLO_ITEMS = [
     originalPrice: 899,
     fabric: '220 GSM Honeycomb Heavy Pique Cotton',
     image: 'https://images.unsplash.com/photo-1625910513413-7e4526d152c7?w=800&auto=format&fit=crop&q=80',
-    description: 'Structured 220 GSM pique knit with non-curling collar and pearlized buttons.',
   },
   {
     id: 'polo-white',
@@ -30,7 +29,6 @@ export const POLO_ITEMS = [
     originalPrice: 899,
     fabric: '220 GSM Honeycomb Heavy Pique Cotton',
     image: 'https://images.unsplash.com/photo-1586363104862-3a5e2ab60d99?w=800&auto=format&fit=crop&q=80',
-    description: 'Crisp optic white cotton with double-layer placket and ribbed sleeve cuffs.',
   },
   {
     id: 'polo-maroon',
@@ -42,7 +40,6 @@ export const POLO_ITEMS = [
     originalPrice: 899,
     fabric: '220 GSM Honeycomb Heavy Pique Cotton',
     image: 'https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=800&auto=format&fit=crop&q=80',
-    description: 'Rich royal wine shade with pre-shrunk combed yarn and reinforced side slits.',
   },
   {
     id: 'polo-navy',
@@ -54,7 +51,6 @@ export const POLO_ITEMS = [
     originalPrice: 899,
     fabric: '220 GSM Honeycomb Heavy Pique Cotton',
     image: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=800&auto=format&fit=crop&q=80',
-    description: 'Versatile deep navy pique shirt with breathable micro-perforated cotton weave.',
   },
   {
     id: 'polo-olive',
@@ -66,33 +62,38 @@ export const POLO_ITEMS = [
     originalPrice: 899,
     fabric: '220 GSM Honeycomb Heavy Pique Cotton',
     image: 'https://images.unsplash.com/photo-1608256246200-53e635b5b65f?w=800&auto=format&fit=crop&q=80',
-    description: 'Tactical earth-tone polo shirt tailored for semi-formal layering and evening wear.',
   },
 ];
 
 export default function PoloWheelExperience() {
+  const containerRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [selectedSize, setSelectedSize] = useState('L');
-  const [wheelRotation, setWheelRotation] = useState(0);
   const [added, setAdded] = useState(false);
   const { addToCart } = useCart();
   const currentPolo = POLO_ITEMS[activeIndex];
 
-  const handleNext = () => {
-    setActiveIndex((prev) => (prev + 1) % POLO_ITEMS.length);
-    setWheelRotation((prev) => prev - (360 / POLO_ITEMS.length));
-  };
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['start start', 'end end'],
+  });
 
-  const handlePrev = () => {
-    setActiveIndex((prev) => (prev - 1 + POLO_ITEMS.length) % POLO_ITEMS.length);
-    setWheelRotation((prev) => prev + (360 / POLO_ITEMS.length));
-  };
+  // Scroll directly drives the continuous physical rotation of the giant wheel!
+  const wheelRotate = useTransform(scrollYProgress, [0, 1], [0, -360]);
 
-  const handleSelectSlice = (idx) => {
-    const diff = idx - activeIndex;
-    setActiveIndex(idx);
-    setWheelRotation((prev) => prev - diff * (360 / POLO_ITEMS.length));
-  };
+  // Synchronize active polo item based on wheel position
+  useEffect(() => {
+    const unsubscribe = scrollYProgress.on('change', (v) => {
+      const idx = Math.min(
+        POLO_ITEMS.length - 1,
+        Math.floor(v * POLO_ITEMS.length)
+      );
+      if (idx >= 0 && idx !== activeIndex) {
+        setActiveIndex(idx);
+      }
+    });
+    return () => unsubscribe();
+  }, [scrollYProgress, activeIndex]);
 
   const handleAddToCart = () => {
     addToCart(
@@ -114,96 +115,76 @@ export default function PoloWheelExperience() {
   };
 
   return (
-    <section className="relative py-20 px-4 sm:px-6 lg:px-8 bg-[#F4EFEA] text-[#1E1E1E] overflow-hidden border-t border-[#DDD6CD]">
-      {/* Background Subtle Paper Texture */}
-      <div className="absolute inset-0 opacity-40 bg-[radial-gradient(#D6CFC4_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
+    <div ref={containerRef} className="relative h-[250vh] bg-[#F7F4EE] text-[#1E1E1E]">
+      {/* Pinned Sticky Section during scroll */}
+      <div className="sticky top-0 h-screen w-full flex flex-col justify-between overflow-hidden px-4 sm:px-8 py-6 sm:py-8">
+        {/* Top Minimalist Header */}
+        <div className="max-w-7xl mx-auto w-full flex items-center justify-between text-xs tracking-widest uppercase font-semibold text-zinc-500 border-b border-[#E0D9CF] pb-3">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-black" />
+            <span>03 / POLO ROTATING WHEEL</span>
+          </div>
+          <div className="hidden sm:block text-[11px] text-zinc-400 tracking-normal font-sans">
+            Scroll to rotate the radial colorway disc • 220 GSM Honeycomb Pique
+          </div>
+          <div className="font-mono font-bold text-black">
+            ₹189 FLAT
+          </div>
+        </div>
 
-      <div className="max-w-7xl mx-auto relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          {/* Left Column: Exact Editorial Layout from polo tshirt .png */}
-          <div className="lg:col-span-5 space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/5 border border-black/15 text-black text-xs font-bold uppercase tracking-widest">
-              <Sparkles className="w-3.5 h-3.5 text-amber-700" />
-              POLO T-SHIRT COLLECTION
-            </div>
+        {/* Central Grid: Editorial Left + Giant Radial Wheel Right */}
+        <div className="max-w-7xl mx-auto w-full my-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          {/* Left Column: Exact Editorial Minimalist Layout from polo tshirt .png */}
+          <div className="lg:col-span-5 space-y-5 z-10">
+            <div className="w-16 h-0.5 bg-black" />
 
-            {/* Horizontal rule from reference */}
-            <div className="w-24 h-0.5 bg-black" />
-
-            {/* Editorial Headline exactly matching reference */}
-            <h2 className="text-4xl sm:text-6xl font-black uppercase font-display leading-[0.95] tracking-tight text-black">
+            <h2 className="text-3xl sm:text-5xl md:text-6xl font-black uppercase font-display leading-[0.95] tracking-tight text-black">
               PREMIUM <br />
               QUALITY YOU <br />
               CAN FEEL
             </h2>
 
-            {/* Social handle matching reference: 📸 Prospera.Clothing -> Bong99.Streetwear */}
-            <div className="flex items-center gap-2 text-xs font-bold text-zinc-700">
-              <Instagram className="w-4 h-4 text-black" />
+            <div className="flex items-center gap-2 text-xs font-semibold text-zinc-600">
+              <Instagram className="w-3.5 h-3.5 text-black" />
               <span>Bong99.Streetwear</span>
             </div>
 
-            {/* Horizontal rule from reference */}
-            <div className="w-24 h-0.5 bg-black" />
+            <div className="w-16 h-0.5 bg-black" />
 
-            {/* Website URL from reference */}
-            <div className="text-xs font-bold uppercase tracking-widest text-zinc-600">
+            <div className="text-[11px] font-bold uppercase tracking-widest text-zinc-500">
               www.bong99.com
             </div>
 
-            {/* Garment Price & Spec */}
-            <div className="pt-2 flex items-baseline gap-4">
-              <span className="text-4xl sm:text-5xl font-black text-black font-display">
+            <div className="pt-1 flex items-baseline gap-3">
+              <span className="text-3xl sm:text-4xl font-mono font-black text-black">
                 ₹{currentPolo.price}
               </span>
-              <span className="text-lg text-zinc-500 line-through">
+              <span className="text-sm font-mono text-zinc-400 line-through">
                 ₹{currentPolo.originalPrice}
               </span>
-              <span className="text-xs px-2.5 py-1 bg-amber-100 text-amber-900 border border-amber-300 font-bold rounded-full">
-                FACTORY DIRECT
+              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-zinc-200 text-zinc-800 rounded">
+                {currentPolo.title}
               </span>
             </div>
 
-            <p className="text-xs sm:text-sm text-zinc-700 leading-relaxed font-sans">
+            <p className="text-xs text-zinc-600 leading-relaxed font-sans max-w-sm">
               {currentPolo.fabric}. Tailored knit anti-curl collar, mother-of-pearl buttons, and structured side vents.
             </p>
 
-            {/* Color Swatches */}
-            <div>
-              <span className="text-[11px] font-bold text-zinc-800 uppercase tracking-wider block mb-2">
-                Colorway: <strong>{currentPolo.color}</strong> ({currentPolo.title})
-              </span>
-              <div className="flex items-center gap-3">
-                {POLO_ITEMS.map((item, idx) => (
-                  <button
-                    key={item.id}
-                    onClick={() => handleSelectSlice(idx)}
-                    className={`w-7 h-7 rounded-full border-2 transition-transform ${
-                      activeIndex === idx
-                        ? 'scale-125 border-black ring-2 ring-black/30'
-                        : 'border-white hover:scale-110 shadow-sm'
-                    }`}
-                    style={{ backgroundColor: item.hex }}
-                    title={item.color}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Size Selector */}
-            <div>
-              <span className="text-[11px] font-bold text-zinc-800 uppercase tracking-wider block mb-2">
+            {/* Size Options */}
+            <div className="space-y-1.5">
+              <span className="text-[10px] font-bold text-zinc-700 uppercase tracking-wider block">
                 Select Size
               </span>
-              <div className="flex gap-2">
+              <div className="flex gap-1.5">
                 {['S', 'M', 'L', 'XL', 'XXL'].map((sz) => (
                   <button
                     key={sz}
                     onClick={() => setSelectedSize(sz)}
-                    className={`w-10 h-9 rounded-lg text-xs font-bold border transition-colors ${
+                    className={`w-9 h-8 rounded text-xs font-bold border transition-colors ${
                       selectedSize === sz
                         ? 'bg-black text-white border-black'
-                        : 'bg-white text-zinc-800 border-zinc-300 hover:border-black'
+                        : 'bg-white text-zinc-800 border-[#DDD5CC] hover:border-black'
                     }`}
                   >
                     {sz}
@@ -212,33 +193,31 @@ export default function PoloWheelExperience() {
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 pt-3">
+            {/* Actions */}
+            <div className="flex gap-2.5 pt-1">
               <button
                 onClick={handleAddToCart}
-                className="py-3 px-6 bg-black hover:bg-zinc-800 text-white font-black text-xs uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg active:scale-95"
+                className="py-2.5 px-5 bg-black hover:bg-zinc-800 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all flex items-center gap-2 active:scale-95 shadow-sm"
               >
-                <ShoppingBag className="w-4 h-4" />
+                <ShoppingBag className="w-3.5 h-3.5" />
                 <span>{added ? 'Added to Bag!' : `Add To Bag (₹${currentPolo.price})`}</span>
               </button>
-              <button
-                onClick={handleNext}
-                className="py-3 px-5 bg-white hover:bg-[#EAE4DC] text-black font-bold text-xs uppercase tracking-wider rounded-xl transition-colors flex items-center justify-center gap-1.5 border border-zinc-300"
+              <Link
+                href="/polo"
+                className="py-2.5 px-4 bg-white hover:bg-[#ECE4DB] text-black font-bold text-xs uppercase tracking-wider rounded-xl transition-colors flex items-center gap-1 border border-[#DDD5CC]"
               >
-                <RotateCw className="w-3.5 h-3.5" />
-                <span>Rotate Wheel</span>
-              </button>
+                <span>Full Line</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
             </div>
           </div>
 
-          {/* Right Column: Giant Rotating Circular Wheel (Ref: polo tshirt .png) */}
-          <div className="lg:col-span-7 relative flex items-center justify-center min-h-[520px] sm:min-h-[620px] overflow-hidden">
-            {/* The Giant Circular Disc Wheel */}
+          {/* Right Column: Giant Rotating Circular Radial Wheel (Driven by Scroll) */}
+          <div className="lg:col-span-7 relative flex items-center justify-center overflow-hidden min-h-[460px] sm:min-h-[560px]">
+            {/* The Giant Rotating Radial Wheel */}
             <motion.div
-              animate={{ rotate: wheelRotation }}
-              transition={{ type: 'spring', stiffness: 120, damping: 18 }}
-              className="relative w-[480px] h-[480px] sm:w-[620px] sm:h-[620px] md:w-[700px] md:h-[700px] rounded-full border-[12px] border-white shadow-[0_20px_60px_rgba(0,0,0,0.18)] bg-[#EBE4DC] flex items-center justify-center flex-shrink-0"
-              style={{ transformOrigin: 'center center' }}
+              style={{ rotate: wheelRotate, transformOrigin: 'center center' }}
+              className="relative w-[480px] h-[480px] sm:w-[580px] sm:h-[580px] md:w-[660px] md:h-[660px] rounded-full border-[10px] border-white shadow-2xl bg-[#EBE3D8] flex items-center justify-center flex-shrink-0"
             >
               {/* Radial Slices / Wedges */}
               {POLO_ITEMS.map((item, idx) => {
@@ -249,26 +228,26 @@ export default function PoloWheelExperience() {
                 return (
                   <div
                     key={item.id}
-                    onClick={() => handleSelectSlice(idx)}
+                    onClick={() => setActiveIndex(idx)}
                     className="absolute inset-0 flex items-center justify-center cursor-pointer group"
                     style={{ transform: `rotate(${rotation}deg)` }}
                   >
                     {/* Wedge divider line */}
-                    <div className="absolute top-0 w-1.5 h-1/2 bg-white origin-bottom transform -translate-x-1/2" />
+                    <div className="absolute top-0 w-1 h-1/2 bg-white origin-bottom transform -translate-x-1/2" />
 
-                    {/* Garment inside the slice */}
+                    {/* Garment inside radial slice */}
                     <div
                       className="absolute top-8 sm:top-12 flex flex-col items-center group-hover:scale-105 transition-transform"
-                      style={{ transform: `rotate(${-rotation - wheelRotation}deg)` }}
+                      style={{ transform: `rotate(${-rotation}deg)` }}
                     >
-                      <div className="relative w-28 h-36 sm:w-36 sm:h-48 rounded-xl overflow-hidden shadow-xl border-2 border-white bg-white/70">
+                      <div className="relative w-24 h-32 sm:w-32 sm:h-44 rounded-xl overflow-hidden shadow-lg border-2 border-white bg-white/80 p-1">
                         <Image
                           src={item.image}
                           alt={item.name}
                           fill
-                          className="object-contain p-2"
+                          className="object-contain p-1"
                         />
-                        <div className="absolute bottom-1 inset-x-1 bg-black/80 text-white rounded text-[9px] font-bold text-center py-0.5">
+                        <div className="absolute bottom-1 inset-x-1 bg-black/80 text-white rounded text-[8px] font-bold text-center py-0.5">
                           {item.title}
                         </div>
                       </div>
@@ -277,22 +256,28 @@ export default function PoloWheelExperience() {
                 );
               })}
 
-              {/* Central Metallic Hub */}
-              <div className="relative z-30 w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-white border-4 border-black/15 shadow-2xl flex flex-col items-center justify-center text-center p-2">
-                <span className="text-[9px] font-black uppercase tracking-widest text-zinc-500">
+              {/* Central Minimalist Hub */}
+              <div className="relative z-30 w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white border border-black/10 shadow-xl flex flex-col items-center justify-center text-center p-2">
+                <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400">
                   BONG99
                 </span>
-                <span className="text-xs sm:text-sm font-black font-display text-black">
+                <span className="text-xs sm:text-sm font-mono font-bold text-black">
                   ₹189
                 </span>
-                <span className="text-[8px] uppercase tracking-wider text-amber-800 font-bold">
+                <span className="text-[7px] uppercase tracking-wider text-zinc-600 font-semibold">
                   PIQUE WEAVE
                 </span>
               </div>
             </motion.div>
           </div>
         </div>
+
+        {/* Bottom Minimalist Bar */}
+        <div className="max-w-7xl mx-auto w-full flex items-center justify-between text-[11px] text-zinc-400 font-mono border-t border-[#E0D9CF] pt-3">
+          <span>{activeIndex + 1} / {POLO_ITEMS.length} COLORWAYS</span>
+          <span className="animate-pulse">SCROLL TO ROTATE WHEEL ↓</span>
+        </div>
       </div>
-    </section>
+    </div>
   );
 }

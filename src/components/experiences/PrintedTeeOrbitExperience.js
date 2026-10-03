@@ -1,17 +1,17 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, ShoppingBag, ArrowRight, RotateCw, RefreshCw, Sun, Moon, Check } from 'lucide-react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { ShoppingBag, ArrowRight, Sun, Moon } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 
 export const GRAPHIC_TEES = [
   {
     id: 'orbit-cyber-bear',
     name: 'Never Give Up Cyber Bear Drop',
-    graphic: 'High Density 3D Cyber Bear',
+    graphic: 'Cyber Bear 3D',
     frontGraphic: 'NEVER GIVE UP',
     color: 'Midnight Black',
     hex: '#161616',
@@ -24,7 +24,7 @@ export const GRAPHIC_TEES = [
   {
     id: 'orbit-panda-what',
     name: 'Tokyo Bamboo Panda "What?"',
-    graphic: 'Harajuku Rave Panda Graphic',
+    graphic: 'Rave Panda GFX',
     frontGraphic: 'What?',
     color: 'Lilac Smoke',
     hex: '#D1C4E9',
@@ -37,7 +37,7 @@ export const GRAPHIC_TEES = [
   {
     id: 'orbit-feel-good',
     name: 'Feel Good Acid Neon Teddy',
-    graphic: 'Acid Neon Splatter Pop Art',
+    graphic: 'Neon Splatter Art',
     frontGraphic: 'FEEL GOOD',
     color: 'Charcoal Grey',
     hex: '#4A4A4A',
@@ -49,8 +49,8 @@ export const GRAPHIC_TEES = [
   },
   {
     id: 'orbit-smile-acid',
-    name: 'Rebel Smile Happiness Distressed',
-    graphic: 'Distressed Rebel Smiley',
+    name: 'Rebel Smile Acid Grunge',
+    graphic: 'Rebel Smile GFX',
     frontGraphic: 'SMILE YOURSELF',
     color: 'Snow White',
     hex: '#F8F9FA',
@@ -63,7 +63,7 @@ export const GRAPHIC_TEES = [
   {
     id: 'orbit-lets-rock',
     name: "Let's Rock Metal Teddy",
-    graphic: 'Heavy Metal Vintage Bear',
+    graphic: 'Heavy Metal Bear',
     frontGraphic: "LET'S ROCK!",
     color: 'Vintage Rose',
     hex: '#C48B9F',
@@ -76,7 +76,7 @@ export const GRAPHIC_TEES = [
   {
     id: 'orbit-life-culture',
     name: 'Cyberpunk Mask Life Culture',
-    graphic: 'Cyber Mask Cyberpunk',
+    graphic: 'Cyber Mask GFX',
     frontGraphic: 'STYLE CULTURE',
     color: 'Washed Teal',
     hex: '#6B8E8E',
@@ -88,8 +88,8 @@ export const GRAPHIC_TEES = [
   },
   {
     id: 'orbit-bamboo-panda',
-    name: 'Harajuku Bamboo Street Panda',
-    graphic: 'Minimal Typography Panda',
+    name: 'Harajuku Bamboo Panda',
+    graphic: 'Bamboo Panda GFX',
     frontGraphic: 'BAMBOO',
     color: 'Sage Pistachio',
     hex: '#A2B997',
@@ -101,8 +101,8 @@ export const GRAPHIC_TEES = [
   },
   {
     id: 'orbit-retro-camo',
-    name: 'Urban Camo Tactical Bear',
-    graphic: 'Military Cyber Street',
+    name: 'Urban Tactical Camo Bear',
+    graphic: 'Tactical Cyber GFX',
     frontGraphic: 'TACTICAL',
     color: 'Port Rust',
     hex: '#7A3B39',
@@ -114,8 +114,8 @@ export const GRAPHIC_TEES = [
   },
   {
     id: 'orbit-skater-bear',
-    name: 'Skater Club GFX Drop',
-    graphic: 'Subway Graffiti Bear',
+    name: 'Subway Skate Club Bear',
+    graphic: 'Subway Graffiti GFX',
     frontGraphic: 'SKATE CLUB',
     color: 'Powder Blue',
     hex: '#A0BED9',
@@ -127,8 +127,8 @@ export const GRAPHIC_TEES = [
   },
   {
     id: 'orbit-cyber-future',
-    name: 'Future World Holographic GFX',
-    graphic: 'Holographic Cyber Rave',
+    name: 'Future World Holographic',
+    graphic: 'Holo Cyber GFX',
     frontGraphic: 'FUTURE WORLD',
     color: 'Jet Black',
     hex: '#141416',
@@ -141,16 +141,39 @@ export const GRAPHIC_TEES = [
 ];
 
 export default function PrintedTeeOrbitExperience({ initialTheme = 'white' }) {
+  const containerRef = useRef(null);
   const [isWhiteTheme, setIsWhiteTheme] = useState(initialTheme === 'white');
   const [isFrontView, setIsFrontView] = useState(false);
-  const [rotationAngle, setRotationAngle] = useState(0);
   const [selectedTee, setSelectedTee] = useState(GRAPHIC_TEES[0]);
   const [added, setAdded] = useState(false);
   const { addToCart } = useCart();
 
-  const rotateNext = () => setRotationAngle((prev) => prev + 36);
-  const rotatePrev = () => setRotationAngle((prev) => prev - 36);
-  const toggleView = () => setIsFrontView((prev) => !prev);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['start start', 'end end'],
+  });
+
+  // 1. Tag 3D Flip linked to scroll:
+  const tagRotateY = useTransform(scrollYProgress, [0.2, 0.6], [0, 180]);
+  const tagSwingZ = useTransform(scrollYProgress, [0, 0.5, 1], [-4, 6, -2]);
+
+  // 2. T-Shirts Orbit Ring rotation linked to scroll:
+  const orbitRotation = useTransform(scrollYProgress, [0, 1], [0, 240]);
+
+  // 3. Auto-flip t-shirt display (back graphics vs front collars) based on scroll progress
+  useEffect(() => {
+    const unsubscribe = scrollYProgress.on('change', (v) => {
+      setIsFrontView(v > 0.45);
+      const teeIdx = Math.min(
+        GRAPHIC_TEES.length - 1,
+        Math.floor(v * GRAPHIC_TEES.length)
+      );
+      if (teeIdx >= 0 && teeIdx !== GRAPHIC_TEES.indexOf(selectedTee)) {
+        setSelectedTee(GRAPHIC_TEES[teeIdx]);
+      }
+    });
+    return () => unsubscribe();
+  }, [scrollYProgress, selectedTee]);
 
   const handleAddToCart = () => {
     addToCart(
@@ -171,128 +194,101 @@ export default function PrintedTeeOrbitExperience({ initialTheme = 'white' }) {
     setTimeout(() => setAdded(false), 2000);
   };
 
-  const bgClass = isWhiteTheme ? 'bg-[#F2F3F5] text-zinc-900' : 'bg-[#121316] text-white';
+  const bgClass = isWhiteTheme ? 'bg-[#F3F4F6] text-zinc-900' : 'bg-[#121316] text-white';
   const tagBg = isWhiteTheme ? 'bg-[#18181B] text-white border-white/20' : 'bg-white text-black border-black/20';
 
   return (
-    <section className={`relative py-16 sm:py-24 px-4 sm:px-6 lg:px-8 transition-colors duration-500 overflow-hidden ${bgClass}`}>
-      <div className="max-w-7xl mx-auto">
-        {/* Section Header with Theme Switcher (White vs Dark Editions from user prompt) */}
-        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
-          {/* Dual Edition Switcher */}
-          <div className="inline-flex items-center gap-1.5 p-1 rounded-full bg-black/10 backdrop-blur border border-black/10 mb-4">
+    <div ref={containerRef} className={`relative h-[250vh] transition-colors duration-500 ${bgClass}`}>
+      {/* Sticky Pinned Viewport during scroll */}
+      <div className="sticky top-0 h-screen w-full flex flex-col justify-between overflow-hidden px-4 sm:px-8 py-6 sm:py-8">
+        {/* Top Minimalist Navigation Header */}
+        <div className="max-w-7xl mx-auto w-full flex items-center justify-between text-xs tracking-widest uppercase font-semibold border-b border-current/15 pb-3">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-current" />
+            <span>04 / PRINTED GRAPHIC ORBIT</span>
+          </div>
+
+          {/* Minimal Theme Switcher */}
+          <div className="flex items-center gap-1.5 p-0.5 rounded-full border border-current/20">
             <button
               onClick={() => setIsWhiteTheme(true)}
-              className={`px-3 py-1 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
-                isWhiteTheme
-                  ? 'bg-white text-black shadow-sm'
-                  : 'text-zinc-500 hover:text-black'
+              className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold transition-all flex items-center gap-1 ${
+                isWhiteTheme ? 'bg-white text-black shadow-sm' : 'opacity-60 hover:opacity-100'
               }`}
             >
-              <Sun className="w-3.5 h-3.5" />
-              <span>Studio White Edition</span>
+              <Sun className="w-3 h-3" />
+              <span>Studio White</span>
             </button>
             <button
               onClick={() => setIsWhiteTheme(false)}
-              className={`px-3 py-1 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
-                !isWhiteTheme
-                  ? 'bg-zinc-800 text-white shadow-sm'
-                  : 'text-zinc-500 hover:text-white'
+              className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold transition-all flex items-center gap-1 ${
+                !isWhiteTheme ? 'bg-zinc-800 text-white shadow-sm' : 'opacity-60 hover:opacity-100'
               }`}
             >
-              <Moon className="w-3.5 h-3.5" />
-              <span>Street Dark Edition</span>
+              <Moon className="w-3 h-3" />
+              <span>Street Dark</span>
             </button>
           </div>
 
-          <h2 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight uppercase font-display">
-            PRINTED GRAPHICS <span className={isWhiteTheme ? 'text-amber-800' : 'text-amber-400'}>₹149</span>
-          </h2>
-
-          <p className="mt-3 text-xs sm:text-sm md:text-base opacity-75 max-w-2xl mx-auto leading-relaxed">
-            Inspired by youth street culture. Watch the circular constellation of graphic prints rotate around the signature Bong99 apparel swing tag.
-          </p>
+          <div className="font-mono font-bold">
+            ₹149 FLAT
+          </div>
         </div>
 
-        {/* Orbit Constellation Playground (Exact recreation of printed tshirt page.mov) */}
-        <div className="relative min-h-[580px] sm:min-h-[660px] flex items-center justify-center">
-          {/* Circular Orbit Ring Guide */}
-          <div className={`absolute w-[360px] h-[360px] sm:w-[540px] sm:h-[540px] rounded-full border border-dashed pointer-events-none opacity-25 ${
-            isWhiteTheme ? 'border-zinc-500' : 'border-zinc-400'
-          }`} />
+        {/* Central Orbit Constellation (Recreating printed tshirt page.mov) */}
+        <div className="relative min-h-[440px] sm:min-h-[540px] flex items-center justify-center my-auto">
+          {/* Subtle Circular Orbit Guideline */}
+          <div className="absolute w-[360px] h-[360px] sm:w-[500px] sm:h-[500px] rounded-full border border-dashed border-current/20 pointer-events-none" />
 
-          {/* Central Hanging Apparel Swing Tag (Ref: printed tshirt page.mov) */}
+          {/* Central Hanging Apparel Swing Tag (Driven by Scroll 3D Flip) */}
           <motion.div
-            onClick={toggleView}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            style={{ rotateZ: tagSwingZ }}
             className="z-30 relative flex flex-col items-center cursor-pointer select-none"
-            title="Click to flip tag & shirts"
+            onClick={() => setIsFrontView((prev) => !prev)}
           >
-            {/* Hanging String with Top Eyelet */}
-            <div className={`w-0.5 h-16 sm:h-20 mb-1 ${isWhiteTheme ? 'bg-zinc-800' : 'bg-zinc-400'}`} />
-            
-            {/* Tag Body with 3D Flip */}
+            {/* Hanging String */}
+            <div className="w-0.5 h-16 sm:h-20 bg-current/40 mb-1" />
+
+            {/* 3D Flipping Tag Body */}
             <motion.div
-              animate={{ rotateY: isFrontView ? 180 : 0 }}
-              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className={`w-36 sm:w-44 rounded-2xl p-4 sm:p-5 shadow-2xl flex flex-col items-center text-center border-2 ${tagBg}`}
-              style={{ transformStyle: 'preserve-3d' }}
+              style={{
+                rotateY: tagRotateY,
+                transformStyle: 'preserve-3d',
+              }}
+              className={`w-36 sm:w-44 rounded-2xl p-4 sm:p-5 shadow-2xl flex flex-col items-center text-center border ${tagBg}`}
             >
               {/* String Eyelet Hole */}
-              <div className={`w-3 h-3 rounded-full mb-2 ${isWhiteTheme ? 'bg-white' : 'bg-black'}`} />
+              <div className={`w-2.5 h-2.5 rounded-full mb-2 ${isWhiteTheme ? 'bg-white' : 'bg-black'}`} />
 
-              {!isFrontView ? (
-                /* Side A: Style Culture & Welcome Message */
-                <div className="space-y-1.5">
-                  <div className="font-display font-black text-2xl tracking-tighter">
-                    BONG<span className="text-red-500">99</span>
-                  </div>
-                  <div className="text-[8px] uppercase tracking-widest font-black opacity-75">
-                    STYLE CULTURE
-                  </div>
-                  <div className="w-full border-t border-current/20 my-2" />
-                  <p className="text-[10px] font-bold leading-tight">
-                    Welcome to Bong99 Street Family
-                  </p>
-                  <div className="mt-2 text-[8px] uppercase tracking-widest font-semibold opacity-60">
-                    FLAUNT IT, TAG US, GET 10% OFF!
-                  </div>
-                  <div className="mt-2 px-2.5 py-0.5 rounded-full font-black text-[10px] bg-red-600 text-white">
-                    FLAT ₹149
-                  </div>
-                  <div className="text-[8px] uppercase tracking-widest opacity-60 pt-1">
-                    MADE IN INDIA
-                  </div>
+              <div className="space-y-1">
+                <div className="font-display font-black text-2xl tracking-tighter">
+                  BONG<span className="text-red-500">99</span>
                 </div>
-              ) : (
-                /* Side B: Inverted Logo side */
-                <div className="space-y-2 transform rotate-180">
-                  <div className="font-display font-black text-2xl tracking-tighter">
-                    BONG<span className="text-red-500">99</span>
-                  </div>
-                  <div className="text-[9px] uppercase tracking-widest font-black">
-                    EST. 2024 / EAST & WEST
-                  </div>
-                  <div className="text-[10px] font-bold">
-                    COLLAR RIB & CHEST PRINTS
-                  </div>
-                  <div className="text-[8px] uppercase opacity-60">
-                    CLICK TO FLIP BACK
-                  </div>
+                <div className="text-[8px] uppercase tracking-widest font-black opacity-75">
+                  STYLE CULTURE
                 </div>
-              )}
+                <div className="w-full border-t border-current/20 my-2" />
+                <p className="text-[10px] font-bold leading-tight">
+                  Welcome to Bong99 Street Family
+                </p>
+                <div className="mt-1.5 px-2 py-0.5 rounded-full font-mono text-[10px] font-bold bg-red-600 text-white">
+                  FLAT ₹149
+                </div>
+                <div className="text-[8px] uppercase tracking-widest opacity-60 pt-1">
+                  MADE IN INDIA
+                </div>
+              </div>
             </motion.div>
           </motion.div>
 
-          {/* Orbiting T-Shirts Array (10 items in circular formation) */}
-          <div
-            className="absolute inset-0 flex items-center justify-center pointer-events-none transition-transform duration-700 ease-out"
-            style={{ transform: `rotate(${rotationAngle}deg)` }}
+          {/* Orbiting T-Shirts Array (10 Tees in Radial Ring, Rotated by Scroll) */}
+          <motion.div
+            style={{ rotate: orbitRotation }}
+            className="absolute inset-0 flex items-center justify-center pointer-events-none"
           >
             {GRAPHIC_TEES.map((tee) => {
               const rad = (tee.angle * Math.PI) / 180;
-              const radius = typeof window !== 'undefined' && window.innerWidth < 640 ? 175 : 255;
+              const radius = typeof window !== 'undefined' && window.innerWidth < 640 ? 165 : 240;
               const x = Math.cos(rad) * radius;
               const y = Math.sin(rad) * radius;
 
@@ -304,18 +300,15 @@ export default function PrintedTeeOrbitExperience({ initialTheme = 'white' }) {
                   key={tee.id}
                   className="absolute pointer-events-auto"
                   style={{
-                    transform: `translate(${x}px, ${y}px) rotate(${-rotationAngle}deg)`,
+                    transform: `translate(${x}px, ${y}px)`,
                   }}
                 >
-                  <motion.button
+                  <button
                     onClick={() => setSelectedTee(tee)}
-                    whileHover={{ scale: 1.15, zIndex: 40 }}
-                    className={`relative w-20 h-28 sm:w-28 sm:h-36 rounded-xl overflow-hidden shadow-2xl transition-all duration-300 border-2 ${
+                    className={`relative w-16 h-24 sm:w-24 sm:h-32 rounded-xl overflow-hidden shadow-xl transition-all duration-300 border ${
                       isSelected
-                        ? 'border-amber-500 ring-4 ring-amber-500/30 scale-110'
-                        : isWhiteTheme
-                        ? 'border-white hover:border-zinc-900 bg-white'
-                        : 'border-zinc-700 hover:border-white bg-zinc-900'
+                        ? 'border-red-500 ring-2 ring-red-500/40 scale-110'
+                        : 'border-current/20 hover:border-current bg-white/10'
                     }`}
                   >
                     <Image
@@ -323,111 +316,62 @@ export default function PrintedTeeOrbitExperience({ initialTheme = 'white' }) {
                       alt={tee.name}
                       fill
                       className="object-contain p-1"
-                      sizes="120px"
+                      sizes="90px"
                     />
 
-                    {/* Tag badge */}
-                    <div className="absolute top-1 left-1 bg-black/80 text-white px-1.5 py-0.5 rounded text-[8px] font-black">
+                    {/* Badge */}
+                    <div className="absolute bottom-0 inset-x-0 bg-black/80 text-white p-0.5 text-[8px] font-mono text-center truncate">
                       ₹{tee.price}
                     </div>
-
-                    {/* Print text label */}
-                    <div className="absolute bottom-0 inset-x-0 bg-black/80 text-white p-1 text-[8px] font-bold text-center truncate">
-                      {isFrontView ? tee.frontGraphic : tee.graphic}
-                    </div>
-                  </motion.button>
+                  </button>
                 </div>
               );
             })}
-          </div>
-
-          {/* Controller Floating Bar */}
-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-3 z-30">
-            <button
-              onClick={rotatePrev}
-              className="px-3.5 py-2 rounded-full text-xs font-bold shadow-lg flex items-center gap-1.5 transition-all bg-white text-black hover:bg-zinc-100 border border-zinc-300"
-            >
-              <RotateCw className="w-3.5 h-3.5 transform -scale-x-100" />
-              <span>Rotate Left</span>
-            </button>
-            <button
-              onClick={toggleView}
-              className="px-4 py-2 rounded-full text-xs font-black shadow-lg flex items-center gap-1.5 transition-all bg-black text-white hover:bg-zinc-800"
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-              <span>{isFrontView ? 'Show Back Graphics' : 'Show Front Collars'}</span>
-            </button>
-            <button
-              onClick={rotateNext}
-              className="px-3.5 py-2 rounded-full text-xs font-bold shadow-lg flex items-center gap-1.5 transition-all bg-white text-black hover:bg-zinc-100 border border-zinc-300"
-            >
-              <RotateCw className="w-3.5 h-3.5" />
-              <span>Rotate Right</span>
-            </button>
-          </div>
+          </motion.div>
         </div>
 
-        {/* Selected Graphic Inspection Panel */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={selectedTee.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className={`max-w-2xl mx-auto mt-10 rounded-2xl p-6 shadow-2xl border flex flex-col sm:flex-row items-center gap-6 ${
-              isWhiteTheme
-                ? 'bg-white border-zinc-200 text-black'
-                : 'bg-zinc-900 border-zinc-800 text-white'
-            }`}
-          >
-            <div className="relative w-28 h-36 rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-950 flex-shrink-0 border border-current/10">
+        {/* Selected Graphic Inspection Bar */}
+        <div className="max-w-2xl mx-auto w-full bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border border-current/15 rounded-2xl p-4 shadow-xl flex items-center justify-between gap-4 z-30">
+          <div className="flex items-center gap-3">
+            <div className="relative w-12 h-14 rounded-lg overflow-hidden bg-zinc-100 flex-shrink-0 border border-current/10">
               <Image
                 src={isFrontView ? selectedTee.imageFront : selectedTee.imageBack}
                 alt={selectedTee.name}
                 fill
-                className="object-contain p-2"
+                className="object-contain p-1"
               />
             </div>
-
-            <div className="flex-1 text-center sm:text-left space-y-2">
-              <div className="text-[10px] font-black uppercase tracking-wider text-red-500">
-                {selectedTee.graphic} • {isFrontView ? 'FRONT VIEW' : 'BACK GRAPHIC'}
+            <div>
+              <div className="text-[10px] font-mono font-bold uppercase text-red-500">
+                {isFrontView ? 'Front Collar Print' : selectedTee.graphic}
               </div>
-              <h4 className="text-lg font-black font-display uppercase">
+              <h4 className="text-xs sm:text-sm font-bold uppercase truncate max-w-[200px] sm:max-w-xs">
                 {selectedTee.name}
               </h4>
-              <div className="flex items-baseline justify-center sm:justify-start gap-3">
-                <span className="text-2xl font-black font-display">
-                  ₹{selectedTee.price}
-                </span>
-                <span className="text-xs opacity-50 line-through">
-                  ₹{selectedTee.originalPrice}
-                </span>
-                <span className="text-[10px] bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-400 px-2 py-0.5 rounded font-bold">
-                  HOT DROP
-                </span>
-              </div>
-
-              <div className="flex items-center justify-center sm:justify-start gap-3 pt-2">
-                <button
-                  onClick={handleAddToCart}
-                  className="px-5 py-2.5 bg-black text-white hover:bg-zinc-800 font-black text-xs uppercase tracking-wider rounded-xl transition-all flex items-center gap-1.5 shadow active:scale-95"
-                >
-                  <ShoppingBag className="w-3.5 h-3.5" />
-                  <span>{added ? 'Added to Bag!' : `Add to Bag (₹${selectedTee.price})`}</span>
-                </button>
-                <Link
-                  href="/printed-tshirts"
-                  className="text-xs opacity-75 hover:opacity-100 flex items-center gap-1 font-semibold"
-                >
-                  <span>Explore Drops</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
             </div>
-          </motion.div>
-        </AnimatePresence>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="text-right">
+              <div className="font-mono font-bold text-sm">₹{selectedTee.price}</div>
+              <div className="text-[9px] text-zinc-400 line-through">₹{selectedTee.originalPrice}</div>
+            </div>
+            <button
+              onClick={handleAddToCart}
+              className="py-2 px-4 bg-black text-white dark:bg-white dark:text-black font-bold text-xs uppercase tracking-wider rounded-xl transition-all flex items-center gap-1.5 shadow active:scale-95"
+            >
+              <ShoppingBag className="w-3.5 h-3.5" />
+              <span>{added ? 'Added!' : 'Add'}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Bottom Minimalist Bar */}
+        <div className="max-w-7xl mx-auto w-full flex items-center justify-between text-[11px] opacity-60 font-mono border-t border-current/15 pt-3">
+          <span>{GRAPHIC_TEES.indexOf(selectedTee) + 1} / {GRAPHIC_TEES.length} GRAPHIC DROPS</span>
+          <span className="animate-pulse">SCROLL TO FLIP TAG & ROTATE RING ↓</span>
+        </div>
       </div>
-    </section>
+    </div>
   );
 }
